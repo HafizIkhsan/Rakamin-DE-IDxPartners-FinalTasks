@@ -3,13 +3,15 @@ import urllib
 from sqlalchemy import create_engine
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv('/opt/airflow/.env')
 
 def get_connection(db_role: str):
     """
     Returns an SQLAlchemy engine connection to the database.
     """
     server = os.getenv('DB_SERVER')
+    db_user = os.getenv('DB_USER')
+    db_pass = os.getenv('DB_PASS')
     
     if db_role == 'source':
         database = os.getenv('SOURCE_DB')
@@ -23,16 +25,15 @@ def get_connection(db_role: str):
         f"DRIVER={{ODBC Driver 18 for SQL Server}};"
         f"SERVER={server};"
         f"DATABASE={database};"
-        f"Trusted_Connection=yes;"
+        f"UID={db_user};"
+        f"PWD={db_pass};"
         f"Encrypt=yes;TrustServerCertificate=yes;"
     )
 
     try:
-        # Ubah string menjadi format SQLAlchemy
         params = urllib.parse.quote_plus(connection_server)
         engine_url = f"mssql+pyodbc:///?odbc_connect={params}"
         
-        # Cetak mesin koneksinya
         engine = create_engine(engine_url)
         return engine
         

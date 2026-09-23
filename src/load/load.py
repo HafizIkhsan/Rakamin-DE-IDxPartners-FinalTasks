@@ -9,7 +9,6 @@ def load_to_mssql(df: pd.DataFrame, table_name: str, connection_engine) -> None:
         connection_engine: The SQLAlchemy engine connection to the database.
     """
     try:
-        # Pandas akan langsung mengenali connection_engine dari SQLAlchemy
         df.to_sql(
             name=table_name, 
             con=connection_engine, 
