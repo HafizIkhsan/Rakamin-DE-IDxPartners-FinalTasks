@@ -9,19 +9,18 @@ from src.transform.transform import (
     dimAccount,
     dimBranch,
     dimCustomer,
-    factTransaction,
 )
 from src.load.load import load_to_mssql
 from src.config.connection import get_connection
 
 @dag(
-    dag_id="etl_pipeline_idx",
+    dag_id="etl_dimensional_table",
     schedule=None,
     start_date=None,
     catchup=False,
 )
 
-def etl_pipeline():
+def etl_dimensional_table():
     @task
     def process_dim_customer():
         source_conn = get_connection('source')
@@ -57,28 +56,7 @@ def etl_pipeline():
 
         load_to_mssql(df=df_dim_account, table_name="DimAccount", connection_engine=target_engine)
 
-    @task
-    def process_fact_transaction():
-        project_dir = Path('/opt/airflow')
-
-        csv_path = project_dir / "data" / "raw" / "transaction_csv.csv"
-        xlsx_path = project_dir / "data" / "raw" / "transaction_excel.xlsx"
-
-        source_conn = get_connection('source')
-        target_engine = get_connection('target')
-
-        df_trx_mssql = extract_table('transaction_db', source_conn)
-        df_csv = extract_csv(str(csv_path))
-        df_xlsx = extract_xlsx(str(xlsx_path))
-
-        df_fact_transaction = factTransaction(dfMmsql=df_trx_mssql, dfCsv=df_csv, dfXlsx=df_xlsx)
-
-        load_to_mssql(df=df_fact_transaction, table_name="FactTransaction", connection_engine=target_engine)
-
     process_dim_customer() >> process_dim_account()
+    process_dim_branch()
 
-    [
-        process_dim_branch()
-    ] >> process_fact_transaction()
-
-etl_pipeline()
+etl_dimensional_table()
