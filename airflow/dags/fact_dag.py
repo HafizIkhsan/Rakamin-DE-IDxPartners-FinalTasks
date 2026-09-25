@@ -1,4 +1,4 @@
-import sys
+import os
 from pathlib import Path
 from airflow.sdk import dag, task
 
@@ -10,6 +10,8 @@ from src.transform.transform import (
 )
 from src.load.load import load_to_mssql
 from src.config.connection import get_connection
+
+from airflow.providers.google.common.hooks.base_google import GoogleBaseHook
 
 @dag(
     dag_id="etl_fact_table",
@@ -37,6 +39,22 @@ def etl_fact_table():
 
         load_to_mssql(df=df_fact_transaction, table_name="FactTransaction", connection_engine=target_engine)
 
-    process_fact_transaction()
+    @task
+    def load_fact_bq():
+        gcp_hook = GoogleBaseHook(gcp_conn_id='gcp_default')
+        credentials = gcp_hook.get_credentials()
+
+        table_id = os.getenv('BQ_TABLE_ID')
+
+        df = extract_table('FactTransaction', get_connection('target'))
+
+        df.to_gbq(
+            destination_table=table_id,
+            project_id=credentials.project_id,
+            if_exists='replace',
+            credentials=credentials
+        )
+
+    process_fact_transaction() >> load_fact_bq()
 
 etl_fact_table()

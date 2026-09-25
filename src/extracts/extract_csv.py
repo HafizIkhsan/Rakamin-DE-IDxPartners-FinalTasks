@@ -13,9 +13,3 @@ def extract_csv(file_path: str) -> pd.DataFrame:
     df = pd.read_csv(file_path)
 
     return df
-
-if __name__ == "__main__":
-    curr_dir = Path(__file__).parent.parent.parent
-    file_path = curr_dir / "data" / "raw" / "transaction_csv.csv"
-    df = extract_csv(file_path)
-    print(df.info())

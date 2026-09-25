@@ -20,7 +20,6 @@ def get_connection(db_role: str):
     else:
         raise ValueError("Invalid db_role. Must be 'source' or 'target'.")
 
-    # String koneksi aslimu
     connection_server = (
         f"DRIVER={{ODBC Driver 18 for SQL Server}};"
         f"SERVER={server};"

@@ -4,11 +4,11 @@ CREATE PROCEDURE DailyTransaction
 AS
 BEGIN
 	SELECT 
-		CAST(TransactionDate AS DATE) as Date,
+		CAST(TransactionDate AS DATE) AS Date,
 		COUNT(TransactionId) AS TotalTransactions,
 		SUM(Amount) AS TotalAmount
 	FROM FactTransaction
-	WHERE TransactionDate BETWEEN @start_date AND @end_date
+	WHERE CAST(TransactionDate AS DATE) BETWEEN @start_date AND @end_date
 	GROUP BY CAST(TransactionDate AS DATE)
 END;
 GO
