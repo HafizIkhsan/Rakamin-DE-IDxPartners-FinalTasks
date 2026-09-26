@@ -1,5 +1,3 @@
-import sys
-from pathlib import Path
 from airflow.sdk import dag, task
 
 from src.extracts.extract_csv import extract_csv
@@ -21,8 +19,14 @@ from src.config.connection import get_connection
 )
 
 def etl_dimensional_table():
+    """
+    DAG for ETL process of dimensional tables (DimCustomer, DimBranch, DimAccount).
+    """
     @task
     def process_dim_customer():
+        """
+        Process of the DimCustomer table
+        """
         source_conn = get_connection('source')
         target_engine = get_connection('target')
 
@@ -36,6 +40,9 @@ def etl_dimensional_table():
 
     @task
     def process_dim_branch():
+        """
+        Process of the DimBranch table
+        """
         source_conn = get_connection('source')
         target_engine = get_connection('target')
 
@@ -47,6 +54,9 @@ def etl_dimensional_table():
 
     @task
     def process_dim_account():
+        """
+        Process of the DimAccount table
+        """
         source_conn = get_connection('source')
         target_engine = get_connection('target')
 

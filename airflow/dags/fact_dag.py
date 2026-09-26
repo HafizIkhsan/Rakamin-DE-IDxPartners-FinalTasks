@@ -21,8 +21,14 @@ from airflow.providers.google.common.hooks.base_google import GoogleBaseHook
 )
 
 def etl_fact_table():
+    """
+    DAG for ETL process of the FactTransaction table.
+    """
     @task
     def process_fact_transaction():
+        """
+        Process of the FactTransaction table
+        """
         project_dir = Path('/opt/airflow')
 
         csv_path = project_dir / "data" / "raw" / "transaction_csv.csv"
@@ -41,6 +47,9 @@ def etl_fact_table():
 
     @task
     def load_fact_bq():
+        """
+        Load the FactTransaction table into Google BigQuery
+        """
         gcp_hook = GoogleBaseHook(gcp_conn_id='gcp_default')
         credentials = gcp_hook.get_credentials()
 
